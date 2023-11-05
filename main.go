@@ -19,6 +19,9 @@ const (
 	bwPortCli     = "3000"
 )
 
+var targetUsername string
+var targetPassword string
+
 func main() {
 
 	if len(os.Args) != 2 {
@@ -36,6 +39,13 @@ func main() {
 
 	if user == "" || host == "" {
 		log.Fatal("Both user and host must be provided and not empty.")
+	}
+
+	killCmd := exec.Command("pkill", "bw")
+	killCmd.Stdout = os.Stdout
+	killCmd.Stderr = os.Stderr
+	if err := killCmd.Run(); err != nil {
+		log.Printf("Failed to kill existing Bitwarden server: %v", err)
 	}
 
 	syncCmd := exec.Command("bw", "sync")
@@ -133,4 +143,34 @@ func main() {
 	}
 
 	fmt.Println("user & hostname", user, host)
+
+	for _, item := range response.Data.Items {
+		if item.Login.Username == user {
+			targetUsername = item.Login.Username
+			targetPassword = item.Login.Password
+			break
+		}
+	}
+
+	if targetUsername != "" {
+		fmt.Printf("Matched User: %s\nPassword: %s\n", targetUsername, targetPassword)
+	} else {
+		fmt.Println("User not found in Bitwarden items.")
+	}
+
+	if targetUsername != "" {
+		fmt.Printf("Matched User: %s\nPassword: %s\n", targetUsername, targetPassword)
+
+		sshCmd := exec.Command("sshpass", "-p", targetPassword, "ssh", "-o", "StrictHostKeyChecking=no", targetUsername+"@"+host)
+		sshCmd.Stdout = os.Stdout
+		sshCmd.Stderr = os.Stderr
+		sshCmd.Stdin = os.Stdin
+
+		if err := sshCmd.Run(); err != nil {
+			log.Fatalf("Failed to execute SSH command: %v", err)
+		}
+	} else {
+		fmt.Println("User not found in Bitwarden items.")
+	}
+
 }
