@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 	"time"
 
@@ -19,6 +20,23 @@ const (
 )
 
 func main() {
+
+	if len(os.Args) != 2 {
+		log.Fatal("Usage: sshbw user@host")
+	}
+
+	arg := os.Args[1]
+	argParts := strings.Split(arg, "@")
+	if len(argParts) != 2 {
+		log.Fatal("Invalid argument format. Use 'user@host'.")
+	}
+
+	user := argParts[0]
+	host := argParts[1]
+
+	if user == "" || host == "" {
+		log.Fatal("Both user and host must be provided and not empty.")
+	}
 
 	syncCmd := exec.Command("bw", "sync")
 	syncCmd.Stdout = os.Stdout
@@ -113,4 +131,6 @@ func main() {
 	for _, item := range response.Data.Items {
 		fmt.Printf("Name: %s\nUsername: %s\nPassword: %s\n\n", item.Name, item.Login.Username, item.Login.Password)
 	}
+
+	fmt.Println("user & hostname", user, host)
 }
