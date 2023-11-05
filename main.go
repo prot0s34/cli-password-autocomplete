@@ -9,17 +9,14 @@ import (
 )
 
 func main() {
-	// Define the Bitwarden CLI serve URL
 	serveURL := "http://localhost:3000"
 
-	// Replace 'YOUR_MASTER_PASSWORD' with your Bitwarden master password
 	masterPassword := os.Getenv("BITWARDEN_MASTER_PASSWORD")
 
 	if masterPassword == "" {
 		log.Fatal("Bitwarden master password not found in the environment variable")
 	}
 
-	// Unlock the Bitwarden vault
 	unlockData := map[string]string{
 		"password": masterPassword,
 	}
