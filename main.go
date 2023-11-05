@@ -21,6 +21,7 @@ const (
 func main() {
 	serveCmd := exec.Command("bw", "serve", "--port", bwPortCli, "--hostname", bwHostnameCli)
 	serveURL := "http://" + bwHostnameCli + ":" + bwPortCli
+	masterPassword := os.Getenv("BITWARDEN_MASTER_PASSWORD")
 
 	if err := serveCmd.Start(); err != nil {
 		log.Fatalf("Failed to start 'bw serve': %v", err)
@@ -55,8 +56,6 @@ func main() {
 
 		time.Sleep(1 * time.Second)
 	}
-
-	masterPassword := os.Getenv("BITWARDEN_MASTER_PASSWORD")
 
 	if masterPassword == "" {
 		log.Fatal("Bitwarden master password not found in the environment variable")
