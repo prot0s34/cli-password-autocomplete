@@ -19,9 +19,22 @@ const (
 )
 
 func main() {
+
+	syncCmd := exec.Command("bw", "sync")
+	syncCmd.Stdout = os.Stdout
+	syncCmd.Stderr = os.Stderr
+
+	if err := syncCmd.Run(); err != nil {
+		log.Fatalf("Failed to run 'bw sync': %v", err)
+	}
+
 	serveCmd := exec.Command("bw", "serve", "--port", bwPortCli, "--hostname", bwHostnameCli)
 	serveURL := "http://" + bwHostnameCli + ":" + bwPortCli
 	masterPassword := os.Getenv("BITWARDEN_MASTER_PASSWORD")
+
+	if masterPassword == "" {
+		log.Fatal("Bitwarden master password not found in the environment variable")
+	}
 
 	if err := serveCmd.Start(); err != nil {
 		log.Fatalf("Failed to start 'bw serve': %v", err)
@@ -55,10 +68,6 @@ func main() {
 		}
 
 		time.Sleep(1 * time.Second)
-	}
-
-	if masterPassword == "" {
-		log.Fatal("Bitwarden master password not found in the environment variable")
 	}
 
 	unlockData := map[string]string{
