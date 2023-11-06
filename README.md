@@ -17,3 +17,10 @@ Allow you ssh to your servers using your bitwarden password automatically.
 
 ### Usage:
 - ```sshbw username@hostname```
+
+
+
+### ToDo:
+- [ ] Add support for ssh keys?
+- [ ] Folder/Org/Collection choice?
+- [ ] --help flag with usage
